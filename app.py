@@ -19,7 +19,8 @@ def get_rates():
     rates = contents['rates']
     list_rates = """"""
     for item in rates.items():
-        list_rates += f"{item[0]}: {item[1]: .2f} /n"
+        list_rates += f"{item[0]}: {item[1]: .2f} \n"
+    print(list_rates)
     return list_rates
 
 
@@ -52,8 +53,8 @@ def respond():
 
 
     else:
-        bot.send_message(chat_id=chat_id, text="There was a problem in the name you used, please enter different name",
-                         reply_to_message_id=msg_id)
+        bot.send_message(chat_id=chat_id, text="""There was a problem with the command you've used. 
+                                               Please enter another command""", reply_to_message_id=msg_id)
     return "ok"
 
 
