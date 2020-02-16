@@ -18,7 +18,7 @@ def get_rates():
     contents = requests.get('https://api.exchangeratesapi.io/latest?base=USD').json()
     rates = contents['rates']
     list_rates = """"""
-    for item in rates.items:
+    for item in rates.items():
         list_rates += f"{item[0]}: {item[1]: .2f} /n"
     return list_rates
 
