@@ -20,7 +20,6 @@ def get_rates():
     list_rates = """"""
     for item in rates.items():
         list_rates += f"{item[0]}: {item[1]: .2f} \n"
-    print(list_rates)
     return list_rates
 
 
