@@ -38,7 +38,6 @@ def respond():
            /list   - to obtain full list of all currencies exchanged recently listed at ECB
            """
         bot.send_message(chat_id=chat_id, text=bot_welcome, reply_to_message_id=msg_id)
-
     elif text == "/list":
         rates = get_rates()
         bot.send_message(chat_id=chat_id, text=rates, reply_to_message_id=msg_id)
