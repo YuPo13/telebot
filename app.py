@@ -62,7 +62,7 @@ def respond():
         try:
             rates = get_rates()
             if isinstance(int(exch_details[0]), int) and exch_details[2] in rates:
-                result = calculate_amount(exch_details[0],exch_details[2])
+                result = calculate_amount(exch_details[0], exch_details[2])
                 bot.send_message(chat_id=chat_id, text=f"USD{exch_details[0]} are {exch_details[2]}{result}",
                                  reply_to_message_id=msg_id)
         except (ValueError, TypeError):
@@ -90,7 +90,7 @@ def index():
 
 
 if __name__ == '__main__':
-   app.run(threaded=True)
+    app.run(threaded=True)
 
 # def main():
 #     updater = Updater('895124509:AAGcYHgIeEud4BJKa6zbzxCwkq2WxQIhlN4', use_context=True)
