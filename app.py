@@ -62,9 +62,9 @@ def respond():
         try:
             rates = get_rates()
             if isinstance(int(exch_details[0]), int) and exch_details[2] in rates:
-            result = calculate_amount(exch_details[0],exch_details[2])
-            bot.send_message(chat_id=chat_id, text=f"USD{exch_details[0]} are {exch_details[2]}{result}",
-                             reply_to_message_id=msg_id)
+                result = calculate_amount(exch_details[0],exch_details[2])
+                bot.send_message(chat_id=chat_id, text=f"USD{exch_details[0]} are {exch_details[2]}{result}",
+                                 reply_to_message_id=msg_id)
         except (ValueError, TypeError):
             bot.send_message(chat_id=chat_id, text="Your input was invalid. Start over again",
                              reply_to_message_id=msg_id)
