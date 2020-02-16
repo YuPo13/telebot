@@ -26,6 +26,7 @@ def respond():
     chat_id = update.message.chat_id
     msg_id = update.message.message_id
     text = update.message.text.encode('utf-8').decode()
+    print("Got message:", text)
     if text == "/start":
         bot_welcome = """
            Welcome to CurrencyExchange bot. 
@@ -47,7 +48,6 @@ def respond():
 
 @app.route('/set_webhook', methods=['GET', 'POST'])
 def set_webhook():
-    print("Here we are")
     s = bot.setWebhook('{URL}{HOOK}'.format(URL=URL, HOOK=TOKEN))
     if s:
         return "webhook setup ok"
