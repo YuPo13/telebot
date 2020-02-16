@@ -23,6 +23,13 @@ def get_rates():
     return list_rates
 
 
+def calculate_amount(amount, ccy):
+    contents = requests.get('https://api.exchangeratesapi.io/latest?base=USD').json()
+    rates = contents['rates']
+    result = amount * float(rates[f'{ccy}'])
+    return result
+
+
 @app.route('/{}'.format(TOKEN), methods=['POST'])
 def respond():
     update = telegram.Update.de_json(request.get_json(force=True), bot)
@@ -42,14 +49,25 @@ def respond():
         rates = get_rates()
         bot.send_message(chat_id=chat_id, text=rates, reply_to_message_id=msg_id)
     elif text == "/exchange":
-        bot_exch_instruction = """
-        Please enter amount of USD to be exchanged to definite currency in format 'USDamount to ccy',
-        where amount is integer number and ccy is required exchange currency code.
-        For example: 
-        USD10 to CAD
-        """
-        bot.send_message(chat_id=chat_id, text=bot_exch_instruction, reply_to_message_id=msg_id)
-
+        bot.send_message(chat_id=chat_id, text="""Please enter: 
+                                                amount of USD to be exchanged (positive integer)
+                                                to
+                                                destination currency code (3 capitalized letters). 
+                                                E.g. in order to exchange USD 10 to CAD, enter 
+                                                10 to CAD 
+                                                """, reply_to_message_id=msg_id)
+        exchange_input = update.message.text.encode('utf-8').decode()
+        exch_details = exchange_input.split()
+        try:
+            rates = get_rates()
+            if isinstance(int(exch_details[0]), int) and exch_details[2] in rates:
+            result = calculate_amount(exch_details[0],exch_details[2])
+            bot.send_message(chat_id=chat_id, text=f"USD{exch_details[0]} are {exch_details[2]}{result}",
+                             reply_to_message_id=msg_id)
+        except (ValueError, TypeError):
+            bot.send_message(chat_id=chat_id, text="Your input was invalid. Start over again",
+                             reply_to_message_id=msg_id)
+            return "Wrong number format"
 
     else:
         bot.send_message(chat_id=chat_id, text="""There was a problem with the command you've used. 
