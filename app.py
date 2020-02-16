@@ -56,7 +56,8 @@ def respond():
                         E.g. in order to exchange USD 10 to CAD, enter 
                         10 to CAD 
                         """
-        bot.send_message(chat_id=chat_id, text=instructions, reply_to_message_id=msg_id)
+        bot.send_message(chat_id=chat_id, text=instructions, reply_to_message_id=msg_id,
+                         reply_markup=telegram.ForceReply())
         new_update = telegram.Update.de_json(request.get_json(force=True), bot)
         exchange_input = new_update.message.text.encode('utf-8').decode()
         exch_details = exchange_input.split()
