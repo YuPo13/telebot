@@ -17,9 +17,9 @@ app = Flask(__name__)
 def get_rates():
     contents = requests.get('https://api.exchangeratesapi.io/latest?base=USD').json()
     rates = contents['rates']
-    list_rates = ""
+    list_rates = """"""
     for item in rates.items:
-        list_rates.append(f"{item[0]}: {item[1]: .2f} /n")
+        list_rates += f"{item[0]}: {item[1]: .2f} /n"
     return list_rates
 
 
@@ -41,6 +41,15 @@ def respond():
     elif text == "/list":
         rates = get_rates()
         bot.send_message(chat_id=chat_id, text=rates, reply_to_message_id=msg_id)
+    elif text == "/exchange":
+        bot_exch_instruction = """
+        Please enter amount of USD to be exchanged to definite currency in format 'USDamount to ccy',
+        where amount is integer number and ccy is required exchange currency code.
+        For example: 
+        USD10 to CAD
+        """
+        bot.send_message(chat_id=chat_id, text=bot_exch_instruction, reply_to_message_id=msg_id)
+
 
     else:
         bot.send_message(chat_id=chat_id, text="There was a problem in the name you used, please enter different name",
