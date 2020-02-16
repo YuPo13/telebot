@@ -49,13 +49,14 @@ def respond():
         rates = get_rates()
         bot.send_message(chat_id=chat_id, text=rates, reply_to_message_id=msg_id)
     elif text == "/exchange":
-        bot.send_message(chat_id=chat_id, text="""Please enter: 
-                                                amount of USD to be exchanged (positive integer)
-                                                to
-                                                destination currency code (3 capitalized letters). 
-                                                E.g. in order to exchange USD 10 to CAD, enter 
-                                                10 to CAD 
-                                                """, reply_to_message_id=msg_id)
+        instructions = """Please enter: 
+                        amount of USD to be exchanged (positive integer)
+                        to
+                        destination currency code (3 capitalized letters). 
+                        E.g. in order to exchange USD 10 to CAD, enter 
+                        10 to CAD 
+                        """
+        bot.send_message(chat_id=chat_id, text=instructions, reply_to_message_id=msg_id)
         exchange_input = update.message.text.encode('utf-8').decode()
         exch_details = exchange_input.split()
         try:
