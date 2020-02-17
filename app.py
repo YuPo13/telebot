@@ -87,6 +87,8 @@ def respond():
                 #bot.send_message(chat_id=chat_id, text=message, reply_to_message_id=msg_id)
                 exch_res = f"USD {exch_input[2]} are {exch_input[4]}{result}"
                 bot.send_message(chat_id=chat_id, text=exch_res, reply_to_message_id=msg_id)
+            else:
+                bot.send_message(chat_id=chat_id, text="Invalid input", reply_to_message_id=msg_id)
         except (ValueError, TypeError, SyntaxError, IndexError):
             bot.send_message(chat_id=chat_id, text="Your input was invalid. Start over again",
                              reply_to_message_id=msg_id)
