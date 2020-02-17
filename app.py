@@ -2,8 +2,10 @@
 from flask import Flask, request
 import telegram
 from telegram.ext import Updater, InlineQueryHandler, CommandHandler
+import plotly.express as px
+import pandas as pd
 import requests
-
+from datetime import datetime, timedelta
 from credentials import bot_token, bot_user_name, URL
 
 global bot
@@ -32,6 +34,24 @@ def calculate_amount(amount, ccy):
     return result
 
 
+def plot(ccy):
+    today_date = datetime.today().strftime("%Y-%m-%d")
+    week_ago = (datetime.today() - timedelta(days=7)).strftime("%Y-%m-%d")
+    source = f"https://api.exchangeratesapi.io/history?start_at=" + week_ago + f"&end_at=" + today_date \
+             + f"&base=USD&symbols=" + f"{ccy}"
+    orig_data = requests.get(f'{source}').json()
+    plot_data = orig_data["rates"]
+    plot_final = sorted(plot_data.items(), key=lambda x: x[0])
+    axis_x = []
+    axis_y = []
+    for element in plot_final:
+        axis_x.append(element[0])
+        axis_y.extend(list(element[1].values()))
+    fig = px.line(x=axis_x, y=axis_y, labels={'x': 'Latest week dates', 'y': f'Amount of {ccy} per USD'})
+    res = fig.show()
+    return res
+
+
 @app.route('/{}'.format(TOKEN), methods=['POST'])
 def respond():
     update = telegram.Update.de_json(request.get_json(force=True), bot)
@@ -57,7 +77,7 @@ def respond():
         try:
             exch_input = text.split()
             rates = get_rates()
-            if exch_input[1] == "USD" and isinstance(exch_input[2],int) \
+            if exch_input[1] == "USD" and isinstance(exch_input[2], int) \
                     and exch_input[3] == "to" and exch_input[4] in rates:
                 result = calculate_amount(exch_input[2], exch_input[4])
                 bot.send_message(chat_id=chat_id, text=f"USD{exch_details[0]} are {exch_details[2]}{result}",
@@ -66,10 +86,23 @@ def respond():
             bot.send_message(chat_id=chat_id, text="Your input was invalid. Start over again",
                              reply_to_message_id=msg_id)
             return "Wrong number format"
+    elif text.startswith("/history"):
+        try:
+            exch_input = text.split()
+            rates = get_rates()
+            if exch_input[1].startswith("USD/") and text.endswith("for 7 days") and exch_input[1][-3:] in rates:
+                result = plot(exch_input[1][-3:])
+                bot.send_photo(chat_id=chat_id, text=f"{result}",
+                                 reply_to_message_id=msg_id)
+        except (ValueError, TypeError):
+            bot.send_message(chat_id=chat_id, text="Your input was invalid. Start over again",
+                             reply_to_message_id=msg_id)
+            return "Wrong number format"
 
     else:
-        bot.send_message(chat_id=chat_id, text="""There was a problem with the command you've used. 
-                                               Please enter another command""", reply_to_message_id=msg_id)
+        unresolved_command = "There was a problem with the command you've used. " \
+                             "Please enter /start to get info on commands available"
+        bot.send_message(chat_id=chat_id, text=unresolved_command, reply_to_message_id=msg_id)
     return "ok"
 
 
