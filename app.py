@@ -74,11 +74,6 @@ def respond():
         bot.send_message(chat_id=chat_id, text=result, reply_to_message_id=msg_id)
     elif text.startswith("/exchange"):
         try:
-            message = """
-                /exchange command performs conversion of provided amount in USD to indicated currency.
-                Example command format is: /exchange USD 10 to CAD 
-                """
-            bot.send_message(chat_id=chat_id, text=message, reply_to_message_id=msg_id)
             exch_input = text.split()
             rates = get_rates()
             if exch_input[1] == "USD" and exch_input[2].isdigit() \
