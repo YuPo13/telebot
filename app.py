@@ -37,7 +37,7 @@ def respond():
     update = telegram.Update.de_json(request.get_json(force=True), bot)
     chat_id = update.message.chat_id
     msg_id = update.message.message_id
-    text = update.message.text.encode('utf-8').decode()
+    text = str(update.message.text.encode('utf-8').decode())
     print("Got message:", text)
     if text == "/start":
         bot_welcome = """
