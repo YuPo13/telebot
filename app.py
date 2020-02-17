@@ -1,15 +1,14 @@
 import matplotlib.pyplot as plt
 from flask import Flask, request
 import telegram
-from telegram.ext import Updater, InlineQueryHandler, CommandHandler
-import plotly.express as px
-import pandas as pd
+
 import requests
 from datetime import datetime, timedelta
 from credentials import bot_token, bot_user_name, URL
 
 global bot
 global TOKEN
+
 TOKEN = bot_token
 bot = telegram.Bot(token=TOKEN)
 
@@ -70,6 +69,8 @@ def respond():
            /list   - to obtain full list of all currencies exchanged recently listed at ECB
            /exchange USD 10 to CAD - to calculate amount of destination currency (CAD in example) 
            equal to set amount of USD (10 in example)
+           /history USD/CAD for 7 days - to obtain chart with destination currency (CAD in example) rate to USD 
+           for recent 7 days period
            """
         bot.send_message(chat_id=chat_id, text=bot_welcome, reply_to_message_id=msg_id)
     elif text == "/list":
@@ -83,8 +84,6 @@ def respond():
             if exch_input[1] == "USD" and exch_input[2].isdigit() \
                     and exch_input[3] == "to" and exch_input[4] in rates:
                 result = float(exch_input[2]) * float(rates[exch_input[4]])
-                #message = "Value calculated:" + str(result)
-                #bot.send_message(chat_id=chat_id, text=message, reply_to_message_id=msg_id)
                 exch_res = f"USD {exch_input[2]} are {exch_input[4]}{result}"
                 bot.send_message(chat_id=chat_id, text=exch_res, reply_to_message_id=msg_id)
             else:
