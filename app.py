@@ -1,4 +1,4 @@
-#import re
+import matplotlib.pyplot as plt
 from flask import Flask, request
 import telegram
 from telegram.ext import Updater, InlineQueryHandler, CommandHandler
@@ -46,9 +46,13 @@ def plot(ccy):
     for element in plot_final:
         axis_x.append(element[0])
         axis_y.extend(list(element[1].values()))
-    fig = px.line(x=axis_x, y=axis_y, labels={'x': 'Latest week dates', 'y': f'Amount of {ccy} per USD'})
-    res = fig.show()
-    return res
+    fig, ax = plt.subplots()
+    ax.plot(axis_x, axis_y)
+    ax.set(xlabel='7-days period', ylabel=f'{ccy} per USD')
+    ax.grid()
+    pict_name = "Weekly_trend.png"
+    fig.savefig(pict_name)
+    return pict_name
 
 
 @app.route('/{}'.format(TOKEN), methods=['POST'])
@@ -93,9 +97,8 @@ def respond():
             rates = get_rates()
             if exch_input[1].startswith("USD/") and text.endswith("for 7 days") and exch_input[1][-3:] in rates:
                 result = plot(exch_input[1][-3:])
-                bot.send_photo(chat_id=chat_id, text=f"{result}",
-                                 reply_to_message_id=msg_id)
-        except (ValueError, TypeError):
+                bot.send_document(chat_id=chat_id, document=open(f'{result}', 'rb'))
+        except (ValueError, TypeError, IndexError, SyntaxError):
             bot.send_message(chat_id=chat_id, text="Your input was invalid. Start over again",
                              reply_to_message_id=msg_id)
             return "Wrong number format"
