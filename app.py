@@ -29,7 +29,6 @@ def list_output(rates_obtained):
 
 
 def calculate_amount(amount, rate):
-    rates = get_rates()
     result = amount * rate
     return result
 
@@ -75,18 +74,18 @@ def respond():
         bot.send_message(chat_id=chat_id, text=result, reply_to_message_id=msg_id)
     elif text.startswith("/exchange"):
         try:
-            bot.send_message(chat_id=chat_id, text="Confirmed:"+text, reply_to_message_id=msg_id)
             message = """
                 /exchange command performs conversion of provided amount in USD to indicated currency.
                 Example command format is: /exchange USD 10 to CAD 
                 """
             exch_input = text.split()
             if len(exch_input) == 5:
-                message = "Input command is correct"
                 rates = get_rates()
                 if exch_input[1] == "USD" and exch_input[2].isdigit() \
                         and exch_input[3] == "to" and exch_input[4] in rates:
-                    result = calculate_amount(float(exch_input[2]), float(rates[exch_input[4]]))
+                    result = float(exch_input[2]) * float(rates[exch_input[4]])
+
+                    bot.send_message(chat_id=chat_id, text=str(result), reply_to_message_id=msg_id)
                     message=f"USD {exch_input[2]} are {exch_input[4]}{result}"
             bot.send_message(chat_id=chat_id, text=message, reply_to_message_id=msg_id)
         except (ValueError, TypeError):
