@@ -75,13 +75,18 @@ def respond():
         bot.send_message(chat_id=chat_id, text=result, reply_to_message_id=msg_id)
     elif text.startswith("/exchange"):
         try:
+            message = """
+                /exchange command performs conversion of provided amount in USD to indicated currency.
+                Example command format is: /exchange USD 10 to CAD 
+                """
             exch_input = text.split()
-            rates = get_rates()
-            if exch_input[1] == "USD" and isinstance(exch_input[2], int) \
-                    and exch_input[3] == "to" and exch_input[4] in rates:
-                result = calculate_amount(exch_input[2], exch_input[4])
-                bot.send_message(chat_id=chat_id, text=f"USD{exch_details[0]} are {exch_details[2]}{result}",
-                                 reply_to_message_id=msg_id)
+            if len(exch_input) == 4:
+                rates = get_rates()
+                if exch_input[1] == "USD" and isinstance(exch_input[2], int) \
+                        and exch_input[3] == "to" and exch_input[4] in rates:
+                    result = calculate_amount(exch_input[2], exch_input[4])
+                    message=f"USD{exch_details[0]} are {exch_details[2]}{result}"
+            bot.send_message(chat_id=chat_id, text=message, reply_to_message_id=msg_id)
         except (ValueError, TypeError):
             bot.send_message(chat_id=chat_id, text="Your input was invalid. Start over again",
                              reply_to_message_id=msg_id)
