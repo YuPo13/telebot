@@ -81,13 +81,19 @@ def respond():
         try:
             exch_input = text.split()
             rates = get_rates()
-            if exch_input[1] == "USD" and exch_input[2].isdigit() \
-                    and exch_input[3] == "to" and exch_input[4] in rates:
+            if exch_input[4] not in rates:
+                bot.send_message(chat_id=chat_id, text="Destination currency is not listed by ECB",
+                                 reply_to_message_id=msg_id)
+            elif exch_input[1] == "USD" and exch_input[2].isdigit() and exch_input[3] == "to":
                 result = float(exch_input[2]) * float(rates[exch_input[4]])
                 exch_res = f"USD {exch_input[2]} are {exch_input[4]}{result}"
                 bot.send_message(chat_id=chat_id, text=exch_res, reply_to_message_id=msg_id)
             else:
-                bot.send_message(chat_id=chat_id, text="Invalid input", reply_to_message_id=msg_id)
+                bot.send_message(chat_id=chat_id, text="""
+                Invalid input. Please conform to request format:
+                /exchange USD /amount figure/ to /3-letter currency code in capital/
+                E.g. /exchange USD 100 to EUR
+                """, reply_to_message_id=msg_id)
         except (ValueError, TypeError, SyntaxError, IndexError):
             bot.send_message(chat_id=chat_id, text="Your input was invalid. Start over again",
                              reply_to_message_id=msg_id)
