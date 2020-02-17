@@ -1,10 +1,9 @@
 import matplotlib.pyplot as plt
 from flask import Flask, request
 import telegram
-
 import requests
 from datetime import datetime, timedelta
-from credentials import bot_token, bot_user_name, URL
+from credentials import bot_token, URL
 
 global bot
 global TOKEN
@@ -25,11 +24,6 @@ def list_output(rates_obtained):
     for item in rates_obtained.items():
         list_rates += f"{item[0]}: {item[1]: .2f} \n"
     return list_rates
-
-
-def calculate_amount(amount, rate):
-    result = amount * rate
-    return result
 
 
 def plot(ccy):
@@ -109,7 +103,6 @@ def respond():
             bot.send_message(chat_id=chat_id, text="Your input was invalid. Start over again",
                              reply_to_message_id=msg_id)
             return "Wrong number format"
-
     else:
         unresolved_command = "There was a problem with the command you've used. " \
                              "Please enter /start to get info on commands available"
@@ -132,16 +125,3 @@ def index():
 
 if __name__ == '__main__':
     app.run(threaded=True)
-
-# def main():
-#     updater = Updater('895124509:AAGcYHgIeEud4BJKa6zbzxCwkq2WxQIhlN4', use_context=True)
-#     dp = updater.dispatcher
-#     dp.add_handler(CommandHandler('list', list))
-#     updater.start_polling()
-#     updater.idle()
-    #    https://430380db.ngrok.io
-    #https://api.telegram.org/bot895124509:AAGcYHgIeEud4BJKa6zbzxCwkq2WxQIhlN4/setWebHook?url=https://430380db.ngrok.io/
-    #https://api.telegram.org/bot895124509:AAGcYHgIeEud4BJKa6zbzxCwkq2WxQIhlN4/getWebhookInfo
-
-# if __name__ == '__main__':
-#     main()
