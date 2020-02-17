@@ -81,7 +81,7 @@ def respond():
                 Example command format is: /exchange USD 10 to CAD 
                 """
             exch_input = text.split()
-            if len(exch_input) == 4:
+            if len(exch_input) == 5:
                 message = "Input command is correct"
                 rates = get_rates()
                 if exch_input[1] == "USD" and exch_input[2].isdigit() \
