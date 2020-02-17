@@ -79,14 +79,13 @@ def respond():
                 Example command format is: /exchange USD 10 to CAD 
                 """
             exch_input = text.split()
-            if len(exch_input) == 5:
-                rates = get_rates()
-                if exch_input[1] == "USD" and exch_input[2].isdigit() \
-                        and exch_input[3] == "to" and exch_input[4] in rates:
-                    result = float(exch_input[2]) * float(rates[exch_input[4]])
-
-                    bot.send_message(chat_id=chat_id, text=str(result), reply_to_message_id=msg_id)
-                    message=f"USD {exch_input[2]} are {exch_input[4]}{result}"
+            rates = get_rates()
+            if exch_input[1] == "USD" and exch_input[2].isdigit() \
+                    and exch_input[3] == "to" and exch_input[4] in rates:
+                result = float(exch_input[2]) * float(rates[exch_input[4]])
+                message = "Value calculated:" +str(result)
+                bot.send_message(chat_id=chat_id, text=message, reply_to_message_id=msg_id)
+                message=f"USD {exch_input[2]} are {exch_input[4]}{result}"
             bot.send_message(chat_id=chat_id, text=message, reply_to_message_id=msg_id)
         except (ValueError, TypeError):
             bot.send_message(chat_id=chat_id, text="Your input was invalid. Start over again",
