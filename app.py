@@ -78,16 +78,17 @@ def respond():
                 /exchange command performs conversion of provided amount in USD to indicated currency.
                 Example command format is: /exchange USD 10 to CAD 
                 """
+            bot.send_message(chat_id=chat_id, text=message, reply_to_message_id=msg_id)
             exch_input = text.split()
             rates = get_rates()
             if exch_input[1] == "USD" and exch_input[2].isdigit() \
                     and exch_input[3] == "to" and exch_input[4] in rates:
                 result = float(exch_input[2]) * float(rates[exch_input[4]])
-                message = "Value calculated:" +str(result)
-                bot.send_message(chat_id=chat_id, text=message, reply_to_message_id=msg_id)
-                message=f"USD {exch_input[2]} are {exch_input[4]}{result}"
-            bot.send_message(chat_id=chat_id, text=message, reply_to_message_id=msg_id)
-        except (ValueError, TypeError):
+                #message = "Value calculated:" + str(result)
+                #bot.send_message(chat_id=chat_id, text=message, reply_to_message_id=msg_id)
+                exch_res = f"USD {exch_input[2]} are {exch_input[4]}{result}"
+                bot.send_message(chat_id=chat_id, text=exch_res, reply_to_message_id=msg_id)
+        except (ValueError, TypeError, SyntaxError, IndexError):
             bot.send_message(chat_id=chat_id, text="Your input was invalid. Start over again",
                              reply_to_message_id=msg_id)
             return "Wrong number format"
