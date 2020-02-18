@@ -6,24 +6,14 @@ from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 import telegram
 import requests
+from marshmallow_sqlalchemy import ModelSchema
 from datetime import datetime, timedelta
 from credentials import bot_token, URL
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
 TOKEN = bot_token
 bot = telegram.Bot(token=TOKEN)
-
-
-class RatesTable(db.Model):
-    """This class represents the structure of local database that maintains requested currency exchange data"""
-    id = db.Column(db.Integer, primary_key=True)
-    currency = db.Column(db.String(4), unique=True)
-    rate = db.Column(db.Numeric)
-    time_requested = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 def get_rates():
@@ -33,16 +23,6 @@ def get_rates():
     """
     contents = requests.get('https://api.exchangeratesapi.io/latest?base=USD').json()
     rates = contents["rates"]
-    rates_db = []
-    for items in rates.items():
-        rate_obj = RatesTable()
-        rate_obj.currency = items[0]
-        rate_obj.rate = items[1]
-        rates_db.append(rate_obj)
-    db.drop_all()
-    db.create_all()
-    db.session.bulk_save_objects(rates_db)
-    db.session.commit()
     return rates
 
 
