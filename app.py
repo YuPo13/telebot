@@ -68,10 +68,7 @@ def list_output(rates_obtained):
     :param rates_obtained: dictionary with currency codes and their USD-based exchange rates
     :return: string with formatted listing of currency codes and their USD-based exchange rates
     """
-    list_rates = """"""
-    for item in rates_obtained.items():
-        list_rates += f"{item[0]}: {item[1]: .2f} \n"
-    return list_rates
+    return "\n".join(f"{key}: {value: .2f}" for key, value in rates_obtained.items())
 
 
 def plot(ccy):
