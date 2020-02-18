@@ -8,7 +8,7 @@ import telegram
 import requests
 from marshmallow_sqlalchemy import ModelSchema
 from datetime import datetime, timedelta
-from credentials import bot_token, URL
+from .credentials import bot_token, URL
 
 
 app = Flask(__name__)
