@@ -14,6 +14,42 @@ from .credentials import bot_token, URL
 app = Flask(__name__)
 TOKEN = bot_token
 bot = telegram.Bot(token=TOKEN)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+
+exchange_rates_api_res = requests.get('https://api.exchangeratesapi.io/latest?base=USD')
+rates = exchange_rates_api_res.json()["rates"]
+
+
+class DownloadsTable(db.Model):
+    """
+    This class describes the table structure for currency exchange rates data to be maintained
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    rates_downloaded = db.Column(db.JSON)
+    time_requested = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class DownloadsSchema(ModelSchema):
+    class Meta:
+        model = DownloadsTable
+
+
+downloads_schema = DownloadsSchema()
+downloads_db = []
+
+
+if db:
+    db.drop_all()
+else:
+    rate_obj = DownloadsTable()
+    rate_obj.rates_downloaded = rates
+    downloads_db.append(rate_obj)
+    db.create_all()
+    db.session.bulk_save_objects(downloads_db)
+    db.session.commit()
 
 
 def get_rates():
