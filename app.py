@@ -1,22 +1,36 @@
+"""
+This module describes the behaviour of telegram bot created for currency exchange rate notifications
+"""
 import matplotlib.pyplot as plt
 from flask import Flask, request
+from flask_sqlalchemy import SQLAlchemy
+from model import RatesTable
 import telegram
 import requests
 from datetime import datetime, timedelta
-from credentials import bot_token, URL
-
-global bot
-global TOKEN
+from credentials import bot_token, URL, SQLALCHEMY_DATABASE_URI, SQLALCHEMY_TRACK_MODIFICATIONS
 
 TOKEN = bot_token
 bot = telegram.Bot(token=TOKEN)
 
 app = Flask(__name__)
+db = SQLAlchemy(app)
 
 
 def get_rates():
     contents = requests.get('https://api.exchangeratesapi.io/latest?base=USD').json()
-    return contents['rates']
+    rates = contents["rates"]
+    rates_db = []
+    for items in rates.items():
+        rate_obj = RatesTable()
+        rate_obj.currency = items[0]
+        rate_obj.rate = items[1]
+        rates_db.append(rate_obj)
+    db.drop_all()
+    db.create_all()
+    db.session.bulk_save_objects(rates_db)
+    db.session.commit()
+    return rates
 
 
 def list_output(rates_obtained):
@@ -80,7 +94,7 @@ def respond():
                                  reply_to_message_id=msg_id)
             elif exch_input[1] == "USD" and exch_input[2].isdigit() and exch_input[3] == "to":
                 result = float(exch_input[2]) * float(rates[exch_input[4]])
-                exch_res = f"USD {exch_input[2]} are {exch_input[4]}{result}"
+                exch_res = f"USD{exch_input[2]} = {exch_input[4]}{result}"
                 bot.send_message(chat_id=chat_id, text=exch_res, reply_to_message_id=msg_id)
             else:
                 bot.send_message(chat_id=chat_id, text="""
