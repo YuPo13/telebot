@@ -4,20 +4,33 @@ This module describes the behaviour of telegram bot created for currency exchang
 import matplotlib.pyplot as plt
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
-from model import RatesTable
 import telegram
 import requests
 from datetime import datetime, timedelta
-from credentials import bot_token, URL, SQLALCHEMY_DATABASE_URI, SQLALCHEMY_TRACK_MODIFICATIONS
+from credentials import bot_token, URL
 
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
 TOKEN = bot_token
 bot = telegram.Bot(token=TOKEN)
 
-app = Flask(__name__)
-db = SQLAlchemy(app)
+
+class RatesTable(db.Model):
+    """This class represents the structure of local database that maintains requested currency exchange data"""
+    id = db.Column(db.Integer, primary_key=True)
+    currency = db.Column(db.String(4), unique=True)
+    rate = db.Column(db.Numeric)
+    time_requested = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 def get_rates():
+    """
+    This function requests USD-based currency exchange data from European Central Bank and saves it into local database.
+    :return: dictionary with USD-based currency exchange rates
+    """
     contents = requests.get('https://api.exchangeratesapi.io/latest?base=USD').json()
     rates = contents["rates"]
     rates_db = []
@@ -34,6 +47,11 @@ def get_rates():
 
 
 def list_output(rates_obtained):
+    """
+    This function produces currencies exchange rate listing with appropriate layout for telegram bot request '/list'
+    :param rates_obtained: dictionary with currency codes and their USD-based exchange rates
+    :return: string with formatted listing of currency codes and their USD-based exchange rates
+    """
     list_rates = """"""
     for item in rates_obtained.items():
         list_rates += f"{item[0]}: {item[1]: .2f} \n"
@@ -41,6 +59,12 @@ def list_output(rates_obtained):
 
 
 def plot(ccy):
+    """
+    This function produces chart of requested currency rate for recent 7 days
+    for telegram bot request '/exchange USD [amount] to [currency code]'
+    :param ccy: requested currency code
+    :return: image file name with plot of requested currency 7-days USD-based exchange rates dynamics chart
+    """
     today_date = datetime.today().strftime("%Y-%m-%d")
     week_ago = (datetime.today() - timedelta(days=7)).strftime("%Y-%m-%d")
     source = f"https://api.exchangeratesapi.io/history?start_at=" + week_ago + f"&end_at=" + today_date \
@@ -64,6 +88,9 @@ def plot(ccy):
 
 @app.route('/{}'.format(TOKEN), methods=['POST'])
 def respond():
+    """
+    This function describes the behaviour of telegram bot according to request send by user
+    """
     update = telegram.Update.de_json(request.get_json(force=True), bot)
     chat_id = update.message.chat_id
     msg_id = update.message.message_id
@@ -126,11 +153,15 @@ def respond():
 
 @app.route('/set_webhook', methods=['GET', 'POST'])
 def set_webhook():
+    """
+    This function sets webhook
+    """
     s = bot.setWebhook('{URL}{HOOK}'.format(URL=URL, HOOK=TOKEN))
     if s:
         return "webhook setup ok"
     else:
         return "webhook setup failed"
+
 
 @app.route('/')
 def index():
