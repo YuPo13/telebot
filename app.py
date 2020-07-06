@@ -8,7 +8,7 @@ import telegram
 import requests
 from marshmallow_sqlalchemy import ModelSchema
 from datetime import datetime, timedelta
-from .credentials import bot_token, URL
+from .env import bot_token, URL
 
 
 app = Flask(__name__)
@@ -102,7 +102,7 @@ def plot(ccy):
 @app.route('/{}'.format(TOKEN), methods=['POST'])
 def respond():
     """
-    This function describes the behaviour of telegram bot according to request send by user
+    This function describes the behaviour of telegram bot according to request sent by user
     """
     update = telegram.Update.de_json(request.get_json(force=True), bot)
     chat_id = update.message.chat_id
